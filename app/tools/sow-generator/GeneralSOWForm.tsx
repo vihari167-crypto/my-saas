@@ -41,15 +41,27 @@ function parseSections(text: string): Section[] {
   return sections;
 }
 
+function boldify(s: string): string {
+  return s
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*/g, "");
+}
+
 function linesToHTML(lines: string[]): string {
   const parts: string[] = [];
   let listItems: string[] = [];
 
   const flushList = () => {
     if (listItems.length) {
-      parts.push(
-        `<ul>${listItems.map((i) => `<li>${i}</li>`).join("")}</ul>`
-      );
+      const items = listItems
+        .map(
+          (item) =>
+            `<div style="display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;line-height:1.8;color:#374151">` +
+            `<span style="color:#2563EB;font-weight:700;flex-shrink:0">✓</span>` +
+            `<span>${boldify(item)}</span></div>`
+        )
+        .join("");
+      parts.push(`<div style="margin:4px 0 12px">${items}</div>`);
       listItems = [];
     }
   };
@@ -61,7 +73,10 @@ function linesToHTML(lines: string[]): string {
       flushList();
     } else {
       flushList();
-      if (line.trim()) parts.push(`<p>${line}</p>`);
+      if (line.trim())
+        parts.push(
+          `<p style="margin:3px 0 8px;color:#374151;font-size:14px;line-height:1.8">${boldify(line)}</p>`
+        );
     }
   }
   flushList();
@@ -136,22 +151,30 @@ export default function GeneralSOWForm() {
         const html = contentEl?.innerHTML ?? "";
         return `<h2>${section.heading}</h2>${html}`;
       })
-      .join("");
+      .join("")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*/g, "");
 
+    const date = new Date().toLocaleDateString("en-US", {
+      year: "numeric", month: "long", day: "numeric",
+    });
     const printHTML = `<!DOCTYPE html><html><head><meta charset="utf-8"/>
 <title>${form.projectName || "Project"} — Scope of Work</title>
 <style>
-  body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:24px;color:#0F172A;font-size:14px;line-height:1.7}
-  h1{font-size:22px;font-weight:700;margin-bottom:4px}
-  h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0F172A;margin-top:28px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E2E8F0}
-  p{margin:3px 0 6px;color:#374151}
-  ul{margin:4px 0 10px;padding-left:20px}
-  li{margin:2px 0;color:#374151}
-  hr{border:none;border-top:1px solid #E2E8F0;margin:12px 0}
+  body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:24px;color:#0F172A;font-size:14px;line-height:1.8}
+  .doc-header{border-top:3px solid #2563EB;padding-top:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #E2E8F0}
+  .doc-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#94A3B8;margin-bottom:4px}
+  .doc-title{font-size:22px;font-weight:700;color:#0F172A;margin-bottom:4px}
+  .doc-meta{font-size:12px;color:#64748B;margin-bottom:2px}
+  h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0F172A;margin-top:28px;margin-bottom:10px;padding:8px 0 8px 10px;border-left:3px solid #2563EB;border-bottom:1px solid #E2E8F0}
   @media print{body{margin:20px}}
 </style></head><body>
-<h1>${form.projectName || "Project"} — Scope of Work</h1>
-<hr/>
+<div class="doc-header">
+  <div class="doc-label">Scope of Work</div>
+  <div class="doc-title">${form.projectName || "Project"}</div>
+  ${form.clientName ? `<div class="doc-meta">Prepared for ${form.clientName}</div>` : ""}
+  <div class="doc-meta">${date}</div>
+</div>
 ${sectionsHTML}
 </body></html>`;
 
@@ -329,7 +352,7 @@ ${sectionsHTML}
       {/* Editable Document Output */}
       {sections.length > 0 && !loading && (
         <>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden" style={{ borderTop: "3px solid #2563EB" }}>
             {/* Toolbar */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
               <div>
@@ -359,24 +382,32 @@ ${sectionsHTML}
             {/* Document body — editable sections */}
             <div className="px-8 py-8 max-w-3xl">
               {/* Document title */}
-              <div className="mb-6 pb-4 border-b border-[#E2E8F0]">
-                <p className="text-xs text-[#94A3B8] uppercase tracking-widest mb-1">
+              <div className="mb-8 pb-5 border-b border-[#E2E8F0]">
+                <p className="text-[10px] text-[#94A3B8] uppercase tracking-widest mb-1">
                   Scope of Work
                 </p>
-                <p className="text-lg font-bold text-[#0F172A]">
+                <p className="text-xl font-bold text-[#0F172A]">
                   {form.projectName || "Project"}
                 </p>
                 {form.clientName && (
-                  <p className="text-sm text-[#64748B] mt-0.5">
+                  <p className="text-sm text-[#64748B] mt-1">
                     Prepared for {form.clientName}
                   </p>
                 )}
+                <p className="text-xs text-[#94A3B8] mt-1">
+                  {new Date().toLocaleDateString("en-US", {
+                    year: "numeric", month: "long", day: "numeric",
+                  })}
+                </p>
               </div>
 
               {sections.map((section, i) => (
                 <div key={i} className="mb-6">
                   {/* Non-editable section heading */}
-                  <div className="text-[11px] font-bold uppercase tracking-widest text-[#0F172A] mb-2 pb-1.5 border-b border-[#E2E8F0]">
+                  <div
+                    className="text-[11px] font-bold uppercase tracking-widest text-[#0F172A] mb-3 pb-2 pl-3 border-b border-[#E2E8F0]"
+                    style={{ borderLeft: "3px solid #2563EB" }}
+                  >
                     {section.heading}
                   </div>
                   {/* Editable section content */}
@@ -386,7 +417,7 @@ ${sectionsHTML}
                     }}
                     contentEditable
                     suppressContentEditableWarning
-                    className="text-sm text-[#374151] leading-relaxed focus:outline-none focus:bg-[#F8FAFC] rounded px-1 -mx-1 transition-colors [&_p]:mb-2 [&_ul]:pl-5 [&_ul]:my-2 [&_li]:mb-1"
+                    className="text-sm text-[#374151] focus:outline-none focus:bg-[#F8FAFC] rounded px-1 -mx-1 transition-colors"
                   />
                 </div>
               ))}

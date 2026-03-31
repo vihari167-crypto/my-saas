@@ -24,6 +24,12 @@ const initialForm: FormData = {
   yourEmail: "",
 };
 
+function boldify(s: string): string {
+  return s
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*/g, "");
+}
+
 function renderDocument(text: string) {
   const lines = text.split("\n");
   const elements: React.ReactNode[] = [];
@@ -32,10 +38,17 @@ function renderDocument(text: string) {
   const flushList = (key: string) => {
     if (listBuffer.length > 0) {
       elements.push(
-        <ul key={`list-${key}`} className="list-disc pl-5 space-y-1 mb-4">
+        <ul key={`list-${key}`} className="list-none pl-0 space-y-1.5 mb-4">
           {listBuffer.map((item, i) => (
-            <li key={i} className="text-[#374151] text-sm leading-relaxed">
-              {item}
+            <li
+              key={i}
+              className="flex gap-2 items-start text-[#374151] text-sm"
+              style={{ lineHeight: "1.8" }}
+            >
+              <span className="text-[#2563EB] font-bold flex-shrink-0 mt-px">
+                ✓
+              </span>
+              <span dangerouslySetInnerHTML={{ __html: boldify(item) }} />
             </li>
           ))}
         </ul>
@@ -50,17 +63,15 @@ function renderDocument(text: string) {
       elements.push(
         <h2
           key={i}
-          className="text-base font-bold text-[#0F172A] mt-8 mb-2 pb-1 border-b border-[#E2E8F0] uppercase tracking-wide"
-        >
-          {line.slice(3)}
-        </h2>
+          className="text-[11px] font-bold text-[#0F172A] mt-8 mb-3 pb-2 uppercase tracking-widest pl-3 border-b border-[#E2E8F0]"
+          style={{ borderLeft: "3px solid #2563EB" }}
+          dangerouslySetInnerHTML={{ __html: boldify(line.slice(3)) }}
+        />
       );
     } else if (line.startsWith("### ")) {
       flushList(String(i));
       elements.push(
-        <h3 key={i} className="text-sm font-semibold text-[#0F172A] mt-4 mb-1">
-          {line.slice(4)}
-        </h3>
+        <h3 key={i} className="text-sm font-semibold text-[#0F172A] mt-4 mb-1" dangerouslySetInnerHTML={{ __html: boldify(line.slice(4)) }} />
       );
     } else if (line.startsWith("- ")) {
       listBuffer.push(line.slice(2));
@@ -70,9 +81,7 @@ function renderDocument(text: string) {
     } else {
       flushList(String(i));
       elements.push(
-        <p key={i} className="text-[#374151] text-sm leading-relaxed mb-2">
-          {line}
-        </p>
+        <p key={i} className="text-[#374151] text-sm mb-2" style={{ lineHeight: "1.8" }} dangerouslySetInnerHTML={{ __html: boldify(line) }} />
       );
     }
   });
@@ -87,7 +96,10 @@ function getPlainText(text: string) {
     .join("\n");
 }
 
-function buildPrintHTML(text: string, projectName: string) {
+function buildPrintHTML(text: string, projectName: string, clientName?: string) {
+  const date = new Date().toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+  });
   const sections = text.split(/^## /m).filter(Boolean);
   const body = sections
     .map((s) => {
@@ -96,25 +108,36 @@ function buildPrintHTML(text: string, projectName: string) {
         .join("\n")
         .split("\n")
         .map((l) => {
-          if (l.startsWith("- ")) return `<li>${l.slice(2)}</li>`;
-          if (l.trim() === "") return "<br/>";
-          return `<p>${l}</p>`;
+          if (l.startsWith("- "))
+            return (
+              `<div style="display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;line-height:1.8;color:#374151">` +
+              `<span style="color:#2563EB;font-weight:700;flex-shrink:0">✓</span>` +
+              `<span>${l.slice(2)}</span></div>`
+            );
+          if (l.trim() === "") return "<div style='height:6px'></div>";
+          return `<p style="margin:3px 0 8px;color:#374151;line-height:1.8">${l}</p>`;
         })
         .join("");
       return `<h2>${heading.trim()}</h2>${content}`;
     })
-    .join("");
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${projectName} — Scope of Work</title>
-  <style>
-    body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:24px;color:#0F172A;font-size:14px;line-height:1.7}
-    h1{font-size:22px;font-weight:700;margin-bottom:4px}
-    h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:28px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E2E8F0}
-    p{margin:4px 0;color:#374151}
-    li{margin-left:20px;color:#374151}
-    ul{margin:4px 0 12px}
-    @media print{body{margin:20px}}
+    .join("")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*/g, "");
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${projectName} — Scope of Work</title><style>
+  body{font-family:Inter,Arial,sans-serif;max-width:760px;margin:40px auto;padding:24px;color:#0F172A;font-size:14px;line-height:1.8}
+  .doc-header{border-top:3px solid #2563EB;padding-top:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #E2E8F0}
+  .doc-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#94A3B8;margin-bottom:4px}
+  .doc-title{font-size:22px;font-weight:700;color:#0F172A;margin-bottom:4px}
+  .doc-meta{font-size:12px;color:#64748B;margin-bottom:2px}
+  h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0F172A;margin-top:28px;margin-bottom:10px;padding:8px 0 8px 10px;border-left:3px solid #2563EB;border-bottom:1px solid #E2E8F0}
+  @media print{body{margin:20px}}
   </style></head><body>
-  <h1>${projectName} — Scope of Work</h1><hr style="margin:12px 0;border:none;border-top:1px solid #E2E8F0"/>
+  <div class="doc-header">
+    <div class="doc-label">Scope of Work</div>
+    <div class="doc-title">${projectName}</div>
+    ${clientName ? `<div class="doc-meta">Prepared for ${clientName}</div>` : ""}
+    <div class="doc-meta">${date}</div>
+  </div>
   ${body}
   </body></html>`;
 }
@@ -162,7 +185,7 @@ export default function WebsiteSOWForm() {
   };
 
   const handleDownloadPDF = () => {
-    const html = buildPrintHTML(generatedSOW, form.projectName || "Project");
+    const html = buildPrintHTML(generatedSOW, form.projectName || "Project", form.clientName);
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(html);
@@ -340,7 +363,7 @@ export default function WebsiteSOWForm() {
       {/* Generated Output */}
       {generatedSOW && !loading && (
         <>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden" style={{ borderTop: "3px solid #2563EB" }}>
             {/* Toolbar */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
               <span className="text-sm font-medium text-[#0F172A]">
@@ -363,6 +386,25 @@ export default function WebsiteSOWForm() {
             </div>
             {/* Document body */}
             <div className="px-8 py-8 max-w-3xl">
+              {/* Document header */}
+              <div className="mb-8 pb-5 border-b border-[#E2E8F0]">
+                <p className="text-[10px] text-[#94A3B8] uppercase tracking-widest mb-1">
+                  Scope of Work
+                </p>
+                <p className="text-xl font-bold text-[#0F172A]">
+                  {form.projectName || "Project"}
+                </p>
+                {form.clientName && (
+                  <p className="text-sm text-[#64748B] mt-1">
+                    Prepared for {form.clientName}
+                  </p>
+                )}
+                <p className="text-xs text-[#94A3B8] mt-1">
+                  {new Date().toLocaleDateString("en-US", {
+                    year: "numeric", month: "long", day: "numeric",
+                  })}
+                </p>
+              </div>
               {renderDocument(generatedSOW)}
             </div>
           </div>
