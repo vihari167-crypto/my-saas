@@ -15,7 +15,7 @@ export default function Navbar() {
             href="/signup"
             className="bg-[#2563EB] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-150"
           >
-            Get Started Free
+            Join Waitlist
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ScopeCreepCalculatorForm from "./ScopeCreepCalculatorForm";
+import TopBanner from "@/components/TopBanner";
 
 export const metadata: Metadata = {
   title: "Scope Creep Cost Calculator — Free Tool | ScopeKit",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function ScopeCreepCalculatorPage() {
   return (
     <div className="bg-white min-h-screen">
+      <TopBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
 
         {/* Page header */}
