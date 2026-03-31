@@ -4,31 +4,28 @@ const tools = [
   {
     name: "Scope of Work Generator",
     description:
-      "Generate a professional scope of work for any industry — web design, construction, consulting, photography and more.",
+      "Generate a professional scope of work for any industry in seconds.",
     href: "/tools/sow-generator",
   },
   {
     name: "Freelance Proposal Generator",
-    description:
-      "Win more clients with a polished AI-written proposal.",
+    description: "Win more clients with a polished AI-written proposal.",
     href: "/tools/freelance-proposal",
   },
   {
-    name: "Freelance Invoice Generator",
-    description:
-      "Create professional invoices instantly, no templates needed.",
+    name: "Invoice Generator",
+    description: "Create professional invoices instantly with live preview.",
     href: "/tools/invoice-generator",
   },
   {
     name: "Freelance Rate Calculator",
-    description:
-      "Find out exactly what you should be charging your clients.",
+    description: "Find out exactly what hourly rate you should be charging.",
     href: "/tools/rate-calculator",
   },
   {
-    name: "Scope Creep Cost Calculator",
+    name: "Scope Creep Calculator",
     description:
-      "See the real dollar amount unplanned extra work is costing you.",
+      "See exactly how much money unplanned extra work is costing you.",
     href: "/tools/scope-creep-calculator",
   },
 ];
@@ -94,11 +91,11 @@ export default function HomePage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] text-center tracking-tight">
             Free AI Tools for Freelancers
           </h2>
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {tools.map((tool) => (
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+            {tools.map((tool, i) => (
               <div
                 key={tool.href}
-                className="bg-white border border-[#E2E8F0] rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className={`bg-white border border-[#E2E8F0] rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow duration-200 lg:col-span-2 ${i === 3 ? "lg:col-start-2" : ""} ${i === 4 ? "lg:col-start-4" : ""}`}
               >
                 <h3 className="text-[#0F172A] font-semibold text-lg">
                   {tool.name}
