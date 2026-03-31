@@ -25,6 +25,12 @@ const tools = [
       "Find out exactly what you should be charging your clients.",
     href: "/tools/rate-calculator",
   },
+  {
+    name: "Scope Creep Cost Calculator",
+    description:
+      "See the real dollar amount unplanned extra work is costing you.",
+    href: "/tools/scope-creep-calculator",
+  },
 ];
 
 const steps = [
