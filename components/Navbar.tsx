@@ -7,8 +7,14 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="text-[#0F172A] font-bold text-xl tracking-tight"
+            className="flex items-center gap-2.5 text-[#0F172A] font-bold text-xl tracking-tight"
           >
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="28" height="28" rx="6" fill="#2563EB"/>
+              <path d="M8 4H17L21 8V24H8V4Z" fill="white"/>
+              <path d="M17 4L21 8H17V4Z" fill="#BFDBFE"/>
+              <path d="M11 15.5L13.5 18L17.5 13" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             ScopeKit
           </Link>
           <Link

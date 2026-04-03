@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "ScopeKit — AI-Powered Proposal & SOW Tool for Freelancers",
   description:
     "Generate professional proposals, scope of work documents, and invoices using AI in seconds. Win more clients. Lose less money.",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='28' height='28' rx='6' fill='%232563EB'/><path d='M8 4H17L21 8V24H8V4Z' fill='white'/><path d='M17 4L21 8H17V4Z' fill='%23BFDBFE'/><path d='M11 15.5L13.5 18L17.5 13' stroke='%232563EB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>",
+  },
 };
 
 export default function RootLayout({
